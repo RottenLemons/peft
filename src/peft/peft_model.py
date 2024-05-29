@@ -37,7 +37,7 @@ from transformers import PreTrainedModel
 from transformers.modeling_outputs import QuestionAnsweringModelOutput, SequenceClassifierOutput, TokenClassifierOutput
 from transformers.utils import PushToHubMixin
 
-from . import __version__
+__version__ = '0.11.2.dev0'
 from .config import PeftConfig
 from .tuners import (
     AdaLoraModel,

@@ -23,6 +23,7 @@ from torch import nn
 from peft.tuners.lora import LoraLayer
 from peft.tuners.tuners_utils import check_adapters_to_merge
 from peft.utils import transpose
+from math import sqrt
 
 
 if packaging.version.parse(transformers.__version__) >= packaging.version.parse("4.33.0"):
@@ -157,7 +158,7 @@ class SVDLinear(nn.Module, AdaLoraLayer):
         return (
             transpose(self.lora_B[adapter] @ (self.lora_A[adapter] * self.lora_E[adapter]), self.fan_in_fan_out)
             * self.scaling[adapter]
-            / (self.ranknum[adapter] + 1e-5)
+            / sqrt(self.ranknum[adapter] + 1e-5)
         )
 
     def forward(self, x: torch.Tensor, *args: Any, **kwargs: Any) -> torch.Tensor:
@@ -180,7 +181,7 @@ class SVDLinear(nn.Module, AdaLoraLayer):
                 ranknum = self.ranknum[active_adapter] + 1e-5
 
                 x = x.to(lora_A.dtype)
-                result += (dropout(x) @ (lora_A * lora_E).T @ lora_B.T) * scaling / ranknum
+                result += (dropout(x) @ (lora_A * lora_E).T @ lora_B.T) * scaling / sqrt(ranknum)
 
         return result
 
