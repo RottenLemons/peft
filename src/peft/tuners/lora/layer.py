@@ -173,6 +173,7 @@ class LoraLayer(BaseTunerLayer):
             Sr = S[: self.r[adapter_name]]
             Sr /= self.scaling[adapter_name]
             Uhr = Uh[: self.r[adapter_name]]
+
         elif len(init_lora_weights.split("_niter_")) == 2:
             Vr, Sr, Ur = svd_lowrank(
                 weight.data, self.r[adapter_name], niter=int(init_lora_weights.split("_niter_")[-1])
@@ -191,6 +192,10 @@ class LoraLayer(BaseTunerLayer):
         weight = weight.data - self.scaling[adapter_name] * lora_B @ lora_A
         weight = weight.to(dtype)
         self.get_base_layer().weight.data = weight
+
+        if (init_lora_weights == "pissa_modified"):
+            for params in self.lora_A[adapter_name].parameters():
+                params.requires_grad = False
 
     def loftq_init(self, adapter_name):
         from peft.utils.loftq_utils import loftq_init
