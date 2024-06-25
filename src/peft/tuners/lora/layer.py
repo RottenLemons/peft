@@ -211,11 +211,11 @@ class LoraLayer(BaseTunerLayer):
 
         lora_A = Ur @ torch.diag(torch.sqrt(Sr))
         lora_B = torch.diag(torch.sqrt(Sr)) @ Vhr 
+        print(adapter_name, lora_A.shape, self.lora_A[adapter_name].weight.shape)
         self.lora_A[adapter_name].weight.data = lora_A
+        print(adapter_name, lora_B.shape, self.lora_B[adapter_name].weight.shape)
         self.lora_B[adapter_name].weight.data = lora_B
-        weight = weight.data
-        weight = weight.to(dtype)
-        self.get_base_layer().weight.data = weight
+
         if (init_lora_weights == "pissa_modified"):
             for params in self.lora_A[adapter_name].parameters():
                 params.requires_grad = False
