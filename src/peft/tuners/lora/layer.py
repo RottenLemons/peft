@@ -185,11 +185,11 @@ class LoraLayer(BaseTunerLayer):
     def pissa_init(self, adapter_name, init_lora_weights):
         weight = self.get_base_layer().weight
         dtype = weight.dtype
-        if dtype not in [torch.float32, torch.float16, torch.bfloat16]:
-            raise TypeError(
-                "Please initialize PiSSA under float32, float16, or bfloat16. "
-                "Subsequently, re-quantize the residual model to help minimize quantization errors."
-            )
+        # if dtype not in [torch.float32, torch.float16, torch.bfloat16]:
+        #     raise TypeError(
+        #         "Please initialize PiSSA under float32, float16, or bfloat16. "
+        #         "Subsequently, re-quantize the residual model to help minimize quantization errors."
+        #     )
         weight = weight.to(torch.float32)
         if init_lora_weights == "pissa":
             # USV^T = W <-> VSU^T = W^T, where W^T = weight.data in R^{out_channel, in_channel},
@@ -212,9 +212,9 @@ class LoraLayer(BaseTunerLayer):
         lora_A = Ur @ torch.diag(torch.sqrt(Sr))
         lora_B = torch.diag(torch.sqrt(Sr)) @ Vhr 
         print(adapter_name, lora_A.shape, self.lora_A[adapter_name].weight.shape)
-        self.lora_A[adapter_name].weight.data = lora_A
+        self.lora_A[adapter_name].weight.data = lora_A.to(dtype)
         print(adapter_name, lora_B.shape, self.lora_B[adapter_name].weight.shape)
-        self.lora_B[adapter_name].weight.data = lora_B
+        self.lora_B[adapter_name].weight.data = lora_B.to(dtype)
 
         if (init_lora_weights == "pissa_modified"):
             for params in self.lora_A[adapter_name].parameters():
