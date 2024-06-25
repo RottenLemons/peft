@@ -28,7 +28,7 @@ from peft.utils.integrations import dequantize_module_weight
 from peft.utils.other import transpose
 
 from .config import LoraConfig
-from .dora import DoraConv2dLayer, DoraLinearLayer
+# from .dora import DoraConv2dLayer, DoraLinearLayer
 
 
 class LoraLayer(BaseTunerLayer):
