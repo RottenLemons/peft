@@ -168,11 +168,16 @@ class LoraLayer(BaseTunerLayer):
             Sr /= self.scaling[adapter_name]
             Vhr = Vh[: self.r[adapter_name]]
         elif init_lora_weights == "pissa_modified":
-            V, S, Uh = torch.linalg.svd(weight.data, full_matrices=False)
-            Vr = torch.zeros_like(V[:, : self.r[adapter_name]])
+            U, S, Vh = torch.linalg.svd(weight.data, full_matrices=False)
+            Ur = U[:, : self.r[adapter_name]]
             Sr = S[: self.r[adapter_name]]
             Sr /= self.scaling[adapter_name]
-            Uhr = Uh[: self.r[adapter_name]]
+            Vhr = torch.zeros_like(Vh[: self.r[adapter_name]])
+            # V, S, Uh = torch.linalg.svd(weight.data, full_matrices=False)
+            # Vr = torch.zeros_like(V[:, : self.r[adapter_name]])
+            # Sr = S[: self.r[adapter_name]]
+            # Sr /= self.scaling[adapter_name]
+            # Uhr = Uh[: self.r[adapter_name]]
 
         elif len(init_lora_weights.split("_niter_")) == 2:
             Vr, Sr, Ur = svd_lowrank(
@@ -185,7 +190,7 @@ class LoraLayer(BaseTunerLayer):
                 f"init_lora_weights should be 'pissa' or 'pissa_niter_[number of iters]', got {init_lora_weights} instead."
             )
 
-        lora_A = U @ torch.diag(torch.sqrt(Sr))
+        lora_A = Ur @ torch.diag(torch.sqrt(Sr))
         lora_B = torch.diag(torch.sqrt(Sr)) @ Vhr 
 
         self.lora_A[adapter_name].weight.data = lora_A
