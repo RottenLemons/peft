@@ -193,7 +193,7 @@ class LoraLayer(BaseTunerLayer):
         weight = weight.to(torch.float32)
         if init_lora_weights == "pissa":
             # USV^T = W <-> VSU^T = W^T, where W^T = weight.data in R^{out_channel, in_channel},
-            U, S, Vh = torch.linalg.svd(weight.data, full_matrices=False)
+            U, S, Vh = torch.linalg.svd(weight.data.T, full_matrices=False)
             Ur = U[:, : self.r[adapter_name]]
             Sr = S[: self.r[adapter_name]]
             Sr /= self.scaling[adapter_name]
